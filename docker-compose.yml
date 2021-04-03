@@ -1,0 +1,31 @@
+version: '3.5'
+
+services: 
+  database:
+    build: db
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: admin
+    volumes:
+      - ./db/:/docker-entrypoint-initdb.d/
+    networks:
+      - my_network
+    expose:
+      - 5432
+  back_end:
+    build: src
+    restart: always
+    depends_on: 
+      - database
+    ports:
+      - 8080:8080
+    networks:
+      - my_network
+    volumes:
+      - ./src/:/usr/src/app
+    command: [ "node", "server/index.js" ]
+
+networks:
+  my_network:
+    name: my_network
